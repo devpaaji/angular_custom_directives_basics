@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html ng-app="advancedDirectives">
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <script src="scripts/angular.js"></script>
+</head>
+<body>
+
+
+
+    <!--Assignment 2-->
+    <p>Two way data binding between parent property scope and isolated scope</p>
+    <div ng-controller="dataController">
+        <databind color="color"></databind>
+        <h3>value of color from the parent controller is : {{color}}</h3>
+    </div>
+    
+    
+   <p>One way data binding between parent property scope and isolated scope</p>
+   
+
+   
+    <div ng-controller="MyCtrl">
+        <h4>This input box shows parent scope property. It is outside directive</h4>
+        <input type="text" ng-model="color">
+        <onewaybind new-color="{{color}}"></onewaybind> 
+
+        <!--
+        <p>Get: {{isolatedColor}}
+            Will not work here because you cannot access property of isolated scope outside the directive
+        </p>-->
+   </div>
+    <hr />
+
+    <p>Binding methods or functions of parent scope to isolated scope</p>
+    <div ng-controller="methodCtrl">
+        Parent Value: <input type="text" ng-model="value"/>
+        <methodbind isolatedmethod="changeVal(n)">
+            <!-- can we create a local var inside a directive so that we can call ng-model on it-->
+            <input type="text" ng-model="isolatedText">
+            <!--button click wll call the method and update the text in parent value proerty-->
+            <button class="myButton" ng-click="isolatedmethod({n:isolatedText})">Enter text and Click button to update parent value</button>
+        </methodbind>
+    </div>
+
+    
+    
+ <script>
+     //create an angularjs module
+     var app = angular.module("advancedDirectives", []);
+     //2:  Write a directive to demonstrate 2-way data binding of parent scope property in isolated scopes
+     // first create a controller
+     app.controller("dataController", ["$scope", function($scope){
+         $scope.color = "orange";
+     }]);
+
+     // create a directive now
+     app.directive("databind", function () {
+         return {
+             restrict: 'E',
+             scope: {
+                color:'='
+             },
+            templateUrl: 'twowaydata.html'
+         };
+     });
+
+
+     //3. Write a directive to demonstrate 1-way data binding of  parent scope property in isolated scopes     app.directive("onewaybind", function () {
+         return {
+             restrict: 'E',
+             scope: {
+                 isolatedColor: '@newColor',
+             },
+             template:
+                    "<h4>From Directive isolated color is {{isolatedColor}}</h4>"
+         };
+     });
+
+     app.controller('MyCtrl', ['$scope', function ($scope) {
+         $scope.color = 'red';
+     }]);
+
+     // 4: Binding methods or calling functions of parent scope from isolated scope
+     app.directive("methodbind", function () {
+         return {
+             restrict: 'E',
+             scope: {
+                 isolatedmethod: '&',
+                 isolatedtText: "",
+             },
+         };
+     });
+
+     app.controller('methodCtrl', ['$scope', function ($scope) {
+         // changeVal is a function that updates text
+         $scope.value = "John";
+         $scope.changeVal = function (n) {
+             $scope.value = n;
+         };
+     }]);
+
+ </script>
+</body>
+</html>
